@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Walmart TwinCart</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
@@ -32,7 +32,7 @@
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: auto;
     }
 
@@ -152,6 +152,44 @@
       background-color: #d32f2f;
     }
 
+    .item-gallery {
+      display: flex;
+      overflow-x: auto;
+      gap: 15px;
+      padding: 10px 0;
+      scroll-behavior: smooth;
+    }
+
+    .item-card {
+      flex: 0 0 auto;
+      width: 180px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: white;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .item-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: contain; /* fixed overflow issue */
+      border-radius: 8px;
+      background: #f4f4f4;
+    }
+
+    .item-card h4 {
+      margin: 10px 0 5px;
+    }
+
+    #search-items {
+      margin-bottom: 10px;
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
     @media (max-width: 768px) {
       .flex {
         flex-direction: column;
@@ -177,13 +215,19 @@
     </div>
 
     <section class="section">
+      <h2>Popular Items</h2>
+      <input type="text" id="search-items" placeholder="Search popular items...">
+      <div class="item-gallery" id="popular-items"></div>
+    </section>
+
+    <section class="section">
       <h2>Shopping Cart <span id="cart-total">$0.00</span></h2>
       <ul id="cart-list"></ul>
     </section>
 
     <div class="flex">
       <section class="section column">
-        <h2>Add Item</h2>
+        <h2>Add Custom Item</h2>
         <input type="text" id="item-name" placeholder="Item Name">
         <input type="number" id="item-price" placeholder="Price" step="0.01">
         <button id="add-item">Add to Cart</button>
@@ -200,6 +244,49 @@
       <ul id="history-list"></ul>
     </section>
   </div>
+
+  <script>
+    const popularItems = [
+      { name: "Apple iPhone 14", price: 799, img: "https://rukminim2.flixcart.com/image/704/844/xif0q/mobile/3/5/l/-original-imaghx9qmgqsk9s4.jpeg?q=90" },
+      { name: "Sony PlayStation 5", price: 499, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3vUmuErkLffRr1zzBLwGVotQICUZ2z93HQA&s" },
+      { name: "GoPro Hero 10", price: 299, img: "https://nimmysonline.com/public/uploads/all/CjFptbxYc8es3gq2iH5EG4AVBdDfrMwOfcOxTsNC.jpg" },
+      { name: "Amazon Echo Dot", price: 49, img: "https://m.media-amazon.com/images/I/61dgl2srHDL.jpg" },
+      { name: "Fitbit Charge 5", price: 129, img: "https://m.media-amazon.com/images/I/61Mz0onKYIL._UF1000,1000_QL80_.jpg" },
+      { name: "Logitech MX Master 3S", price: 99, img: "https://m.media-amazon.com/images/I/61jFSvCTfpL.jpg" },
+      { name: "Xiaomi Smart Band 7", price: 65, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbTtWhLICR5h9Buckj43Arsn9DSJs3VthP0g&s" },
+      { name: "Apple Watch SE", price: 279, img: "https://m.media-amazon.com/images/I/71zkJruS5yL._UF1000,1000_QL80_.jpg" },
+      { name: "Canon EOS 200D", price: 599, img: "https://rukminim2.flixcart.com/image/292/360/l5fnhjk0/dslr-camera/g/t/7/eos-r10-24-2-r10-canon-original-imagg4y52cybasdr.jpeg?q=90&crop=false" },
+      { name: "Samsung Smart TV", price: 699, img: "https://kaydeeelectronics.in/cdn/shop/files/untitled-design-2024-08-12t114354184-66b9aae66262d.webp?v=1737196904&width=1445" }
+    ];
+
+    const gallery = document.getElementById('popular-items');
+    const searchInput = document.getElementById('search-items');
+
+    function renderPopularItems(filter = "") {
+      gallery.innerHTML = "";
+      const filtered = popularItems.filter(item => item.name.toLowerCase().includes(filter.toLowerCase()));
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <img src="${item.img}" alt="${item.name}">
+          <h4>${item.name}</h4>
+          <p>$${item.price.toFixed(2)}</p>
+          <button onclick="addToCart('${item.name}', ${item.price})">Add</button>
+        `;
+        gallery.appendChild(card);
+      });
+    }
+
+    function addToCart(name, price) {
+      document.getElementById('item-name').value = name;
+      document.getElementById('item-price').value = price;
+      document.getElementById('add-item').click();
+    }
+
+    searchInput.addEventListener('input', e => renderPopularItems(e.target.value));
+    renderPopularItems();
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
