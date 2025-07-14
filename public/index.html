@@ -1,58 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Walmart TwinCart</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Walmart TwinCart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    :root {
+      --primary-color: #0071ce;
+      --secondary-color: #ffc220;
+      --dark-color: #1d252d;
+      --light-color: #f9f9f9;
+      --card-bg: #ffffff;
+      --success-color: #4caf50;
+      --error-color: #f44336;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--light-color);
+      color: var(--dark-color);
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      margin-bottom: 10px;
+    }
+
+    .user-controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      min-width: 160px;
+    }
+
+    button {
+      padding: 10px 15px;
+      background-color: var(--secondary-color);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #e6aa00;
+    }
+
+    .section {
+      background-color: var(--card-bg);
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+
+    #cart-list li,
+    #members-list li,
+    #history-list li {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .flex {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .column {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    #cart-total {
+      float: right;
+      font-size: 1.1em;
+      color: var(--success-color);
+    }
+
+    .share-section {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    #share-link-input {
+      flex: 1;
+      background: #f1f1f1;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .remove-item {
+      background-color: var(--error-color);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .remove-item:hover {
+      background-color: #d32f2f;
+    }
+
+    @media (max-width: 768px) {
+      .flex {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🛒 Walmart TwinCart</h1>
-            <div class="user-controls">
-                <input type="text" id="username" placeholder="Your Name" required>
-                <input type="text" id="cart-id" placeholder="Cart ID">
-                <button id="join-cart">Join Cart</button>
-                <button id="create-cart">Create New Cart</button>
-            </div>
-        </header>
+  <div class="container">
+    <header>
+      <h1>🛒 Walmart TwinCart</h1>
+      <div class="user-controls">
+        <input type="text" id="username" placeholder="Your Name">
+        <input type="text" id="cart-id" placeholder="Cart ID">
+        <button id="join-cart">Join Cart</button>
+        <button id="create-cart">Create New Cart</button>
+      </div>
+    </header>
 
-        <div class="share-section">
-            <input type="text" id="share-link-input" readonly>
-            <button id="share-link">Copy Share Link</button>
-        </div>
-
-        <main>
-            <section class="cart-section">
-                <h2>Shopping Cart <span id="cart-total">$0.00</span></h2>
-                <ul id="cart-list"></ul>
-            </section>
-
-            <div class="flex-row">
-                <section class="add-item-section">
-                    <h2>Add Item</h2>
-                    <div class="add-item-form">
-                        <input type="text" id="item-name" placeholder="Item name" required>
-                        <input type="number" id="item-price" placeholder="Price" step="0.01" required>
-                        <button id="add-item">Add to Cart</button>
-                    </div>
-                </section>
-
-                <section class="members-section">
-                    <h2>Cart Members</h2>
-                    <ul id="members-list"></ul>
-                </section>
-            </div>
-
-            <section class="history-section">
-                <h2>Cart History</h2>
-                <ul id="history-list"></ul>
-            </section>
-        </main>
+    <div class="share-section">
+      <input type="text" id="share-link-input" readonly>
+      <button id="share-link">Copy Share Link</button>
     </div>
 
-    <script src="script.js"></script>
+    <section class="section">
+      <h2>Shopping Cart <span id="cart-total">$0.00</span></h2>
+      <ul id="cart-list"></ul>
+    </section>
+
+    <div class="flex">
+      <section class="section column">
+        <h2>Add Item</h2>
+        <input type="text" id="item-name" placeholder="Item Name">
+        <input type="number" id="item-price" placeholder="Price" step="0.01">
+        <button id="add-item">Add to Cart</button>
+      </section>
+
+      <section class="section column">
+        <h2>Cart Members</h2>
+        <ul id="members-list"></ul>
+      </section>
+    </div>
+
+    <section class="section">
+      <h2>Cart History</h2>
+      <ul id="history-list"></ul>
+    </section>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>
